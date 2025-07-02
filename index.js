@@ -46,6 +46,7 @@ function saveEmployees() {
 
 function renderEmployees() {
     const employeeList = document.getElementById('employeeList');
+    const spreadsheetView = document.getElementById('spreadsheetView');
     
     if (employees.length === 0) {
         employeeList.innerHTML = `
@@ -54,10 +55,15 @@ function renderEmployees() {
                 <p>Agrega el primer empleado usando el formulario de arriba</p>
             </div>
         `;
+        spreadsheetView.style.display = 'none';
         return;
     }
 
-    // Agrupar empleados por oficina
+    // Mostrar la vista de hoja de cálculo
+    spreadsheetView.style.display = 'block';
+    employeeList.style.display = 'none';
+
+    // Agrupar empleados por oficina y ordenar
     const groupedEmployees = {};
     employees.forEach((employee, index) => {
         if (!groupedEmployees[employee.office]) {
@@ -66,50 +72,45 @@ function renderEmployees() {
         groupedEmployees[employee.office].push({...employee, index});
     });
 
-    // Generar HTML
+    // Generar tabla estilo hoja de cálculo
+    const spreadsheetBody = document.getElementById('spreadsheetBody');
     let html = '';
+    
     Object.keys(groupedEmployees).sort().forEach(office => {
-        html += `
-            <div class="employee-table">
-                <div class="office-header">
-                    🏢 Oficina ${office}
-                </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Puesto</th>
-                            <th>Empleado</th>
-                            <th>Cargo</th>
-                            <th>Tipo</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
+        const officeEmployees = groupedEmployees[office];
         
-        groupedEmployees[office].forEach(employee => {
+        // Separar empleados SENA de regulares
+        const regularEmployees = officeEmployees.filter(emp => !emp.isSena);
+        const senaEmployees = officeEmployees.filter(emp => emp.isSena);
+        
+        // Agregar empleados regulares
+        regularEmployees.forEach((employee, index) => {
             html += `
                 <tr>
-                    <td>${employee.position || '-'}</td>
-                    <td>${employee.name}</td>
-                    <td>${employee.role || '-'}</td>
-                    <td>${employee.isSena ? '<span class="sena-badge">SENA</span>' : 'Regular'}</td>
-                    <td class="actions">
-                        <button class="btn btn-edit" onclick="editEmployee(${employee.index})">✏️ Editar</button>
-                        <button class="btn btn-danger" onclick="deleteEmployee(${employee.index})">🗑️ Eliminar</button>
-                    </td>
+                    <td class="office-cell">${index === 0 ? office : ''}</td>
+                    <td class="position-cell">${employee.position || (index + 1)}</td>
+                    <td class="regular-cell">${employee.name}</td>
+                    <td class="employee-name">${employee.role || 'Empleado'}</td>
                 </tr>
             `;
         });
         
-        html += `
-                    </tbody>
-                </table>
-            </div>
-        `;
+        // Agregar empleados SENA si existen
+        if (senaEmployees.length > 0) {
+            senaEmployees.forEach((employee, index) => {
+                html += `
+                    <tr>
+                        <td class="office-cell">${regularEmployees.length === 0 && index === 0 ? office : ''}</td>
+                        <td class="position-cell">${employee.position || `Sofá ${index + 1}`}</td>
+                        <td class="sena-cell">${employee.name}</td>
+                        <td class="employee-name">SENA</td>
+                    </tr>
+                `;
+            });
+        }
     });
 
-    employeeList.innerHTML = html;
+    spreadsheetBody.innerHTML = html;
 }
 
 function editEmployee(index) {
@@ -140,4 +141,64 @@ function clearForm() {
     document.getElementById('employeeForm').reset();
     editingIndex = -1;
     document.querySelector('button[type="submit"]').textContent = 'Agregar Empleado';
+}
+
+// Función para exportar a Excel (simulada)
+function exportToExcel() {
+    if (employees.length === 0) {
+        alert('No hay datos para exportar');
+        return;
+    }
+    
+    // Crear contenido CSV
+    let csvContent = "Oficina,Número de puesto,Puestos Fijos,Empleado\n";
+    
+    // Agrupar empleados por oficina
+    const groupedEmployees = {};
+    employees.forEach((employee) => {
+        if (!groupedEmployees[employee.office]) {
+            groupedEmployees[employee.office] = [];
+        }
+        groupedEmployees[employee.office].push(employee);
+    });
+    
+    Object.keys(groupedEmployees).sort().forEach(office => {
+        const officeEmployees = groupedEmployees[office];
+        
+        // Separar empleados SENA de regulares
+        const regularEmployees = officeEmployees.filter(emp => !emp.isSena);
+        const senaEmployees = officeEmployees.filter(emp => emp.isSena);
+        
+        // Agregar empleados regulares
+        regularEmployees.forEach((employee, index) => {
+            csvContent += `${index === 0 ? office : ''},${employee.position || (index + 1)},${employee.name},${employee.role || 'Empleado'}\n`;
+        });
+        
+        // Agregar empleados SENA
+        senaEmployees.forEach((employee, index) => {
+            csvContent += `${regularEmployees.length === 0 && index === 0 ? office : ''},${employee.position || `Sofá ${index + 1}`},${employee.name},SENA\n`;
+        });
+    });
+    
+    // Crear y descargar archivo
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'empleados.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Función para limpiar todos los datos
+function clearAllData() {
+    if (confirm('⚠️ ¿Estás seguro de que quieres eliminar TODOS los empleados registrados? Esta acción no se puede deshacer.')) {
+        employees = [];
+        saveEmployees();
+        renderEmployees();
+        clearForm();
+        alert('✅ Todos los datos han sido eliminados correctamente.');
+    }
 }

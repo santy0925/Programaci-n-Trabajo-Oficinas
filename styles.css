@@ -226,4 +226,96 @@ tr:hover {
     th, td {
         padding: 10px;
     }
+    
+    .table-wrapper {
+        overflow-x: auto;
+    }
+}
+
+/* Estilos para la vista de hoja de cálculo */
+.spreadsheet-container {
+    margin-top: 30px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.spreadsheet-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.spreadsheet-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.table-wrapper {
+    max-height: 600px;
+    overflow-y: auto;
+    border: 2px solid #e9ecef;
+}
+
+.spreadsheet-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.spreadsheet-table th {
+    background: #f8f9fa;
+    color: #333;
+    font-weight: 700;
+    text-align: center;
+    padding: 12px 8px;
+    border: 1px solid #dee2e6;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.spreadsheet-table td {
+    padding: 8px;
+    border: 1px solid #dee2e6;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.office-cell {
+    background: #e3f2fd;
+    font-weight: 700;
+    color: #1976d2;
+}
+
+.position-cell {
+    background: #f3e5f5;
+    font-weight: 600;
+}
+
+.sena-cell {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.regular-cell {
+    background: #d4edda;
+    color: #155724;
+}
+
+.employee-name {
+    font-weight: 500;
+}
+
+.spreadsheet-table tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+.spreadsheet-table tbody tr:hover {
+    background-color: #e7f3ff;
 }

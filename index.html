@@ -57,6 +57,7 @@
                     </div>
                     <button type="submit" class="btn btn-primary">Agregar Empleado</button>
                     <button type="button" class="btn btn-secondary" onclick="clearForm()">Limpiar Formulario</button>
+                    <button type="button" class="btn btn-danger" onclick="clearAllData()">🗑️ Limpiar Todo</button>
                 </form>
             </div>
 
@@ -66,9 +67,31 @@
                     <p>Agrega el primer empleado usando el formulario de arriba</p>
                 </div>
             </div>
+            
+            <!-- Tabla estilo hoja de cálculo -->
+            <div id="spreadsheetView" class="spreadsheet-container" style="display: none;">
+                <div class="spreadsheet-header">
+                    <h2>📊 Lista de Empleados - Formato Hoja</h2>
+                    <button class="btn btn-secondary" onclick="exportToExcel()">📥 Exportar a Excel</button>
+                </div>
+                <div class="table-wrapper">
+                    <table id="spreadsheetTable" class="spreadsheet-table">
+                        <thead>
+                            <tr>
+                                <th>Oficina</th>
+                                <th>Número de puesto</th>
+                                <th>Puestos Fijos</th>
+                                <th>Cargo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spreadsheetBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="index.js"></script>
 </body>
 </html>
